@@ -14,6 +14,8 @@ pipeline {
         
         stage('Build with Maven') {
             steps {
+                // Grant execute permission to mvnw
+                sh 'chmod +x mvnw'
                 sh './mvnw clean package'
             }
         }
