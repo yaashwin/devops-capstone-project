@@ -47,18 +47,14 @@ pipeline {
             steps {
                 sshagent(['ec2-ssh-key_1']) {
                     sh '''
+                    #!/bin/bash
+                    set -e  # Exit immediately if a command exits with a non-zero status
                     ssh -o StrictHostKeyChecking=no ec2-user@ec2-3-128-182-162.us-east-2.compute.amazonaws.com "
-                        # Check if the container is running and stop it if it exists
-                        if [ \$(docker ps -q --filter name=spring-boot-demo) ]; then
-                            docker stop spring-boot-demo
-                        fi
-
-                        # Check if the container exists and remove it if it does
-                        if [ \$(docker ps -aq --filter name=spring-boot-demo) ]; then
-                            docker rm spring-boot-demo
-                        fi
+                        # Stop and remove existing container if it exists
+                        docker ps -q --filter name=spring-boot-demo | xargs -r docker stop || true
+                        docker ps -aq --filter name=spring-boot-demo | xargs -r docker rm || true
                         
-                        # Pull the latest image with the specific build ID and run a new container
+                        # Pull the latest image and run a new container
                         docker pull naadira/spring-boot-demo:${env.BUILD_ID}
                         docker run -d -p 8080:8080 --name spring-boot-demo naadira/spring-boot-demo:${env.BUILD_ID}
                     "
