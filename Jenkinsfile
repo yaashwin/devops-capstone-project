@@ -25,8 +25,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Build the Docker image and tag it with the build ID
-                    docker.build("naadira/spring-boot-demo:${env.BUILD_ID}")
+                    // Build the Docker image and tag it as 'latest'
+                    docker.build("naadira/spring-boot-demo:latest")
                 }
             }
         }
@@ -36,33 +36,32 @@ pipeline {
                 script {
                     // Log in to Docker Hub and push the tagged image
                     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
-                        // Push the tagged image to Docker Hub with the build ID tag
-                        docker.image("naadira/spring-boot-demo:${env.BUILD_ID}").push("${env.BUILD_ID}")
+                        // Push the image with the 'latest' tag
+                        docker.image("naadira/spring-boot-demo:latest").push("latest")
                     }
                 }
             }
         }
 
         stage('Deploy to EC2') {
-    steps {
-        sshagent(['ec2-ssh-key_1']) {
-            sh '''
-                set -e
-                ssh -o StrictHostKeyChecking=no ec2-user@ec2-3-128-182-162.us-east-2.compute.amazonaws.com << 'ENDSSH'
-                # Your deployment commands here
-                docker pull naadira/spring-boot-demo:latest
-                # You might want to run a command to stop any existing container first
-                # docker stop <container_id> || true
-                # docker rm <container_id> || true
-                docker run -d -p 8080:8080 naadira/spring-boot-demo:latest
-                ENDSSH
-            '''
+            steps {
+                sshagent(['ec2-ssh-key_1']) {
+                    sh '''
+                        set -e
+                        ssh -o StrictHostKeyChecking=no ec2-user@ec2-3-128-182-162.us-east-2.compute.amazonaws.com << 'ENDSSH'
+                        # Your deployment commands here
+                        docker pull naadira/spring-boot-demo:latest
+                        # Stop and remove any existing container (optional)
+                        docker stop spring-boot-demo-container || true
+                        docker rm spring-boot-demo-container || true
+                        # Run the Docker container
+                        docker run -d --name spring-boot-demo-container -p 8080:8080 naadira/spring-boot-demo:latest
+                        ENDSSH
+                    '''
+                }
+            }
         }
     }
-}
-
-
-}
 
     post {
         success {
