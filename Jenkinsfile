@@ -24,7 +24,7 @@ pipeline {
             steps {
                 script {
                     // Build the Docker image and tag it with the build ID
-                    docker.build("spring-boot-demo:${env.BUILD_ID}")
+                    docker.build("naadira/spring-boot-demo:${env.BUILD_ID}")
                 }
             }
         }
@@ -33,10 +33,8 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
-                        // Tag the image with the correct format
-                        docker.image("spring-boot-demo:${env.BUILD_ID}").tag("naadira/spring-boot-demo:latest")
                         // Push the tagged image to Docker Hub
-                        docker.image("naadira/spring-boot-demo:latest").push()
+                        docker.image("naadira/spring-boot-demo:${env.BUILD_ID}").push("latest")
                     }
                 }
             }
