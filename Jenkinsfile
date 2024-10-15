@@ -8,8 +8,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git credentialsId: 'jenkins_test', url: 'https://github.com/Naadira/devops-capstone-project.git'
-            }
+                git 'https://github.com/Naadira/devops-capstone-project.git'
             }
         }
         
@@ -56,4 +55,4 @@ pipeline {
             echo 'Deployment Failed!'
         }
     }
-
+}
