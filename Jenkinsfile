@@ -32,14 +32,14 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
-                    // Correct the image tag here
-                    docker.image("spring-boot-demo:${env.BUILD_ID}").tag("naadira/spring-boot-demo:latest")
-                    docker.image("naadira/spring-boot-demo:latest").push()
+                        // Correct the image tag here
+                        docker.image("spring-boot-demo:${env.BUILD_ID}").tag("naadira/spring-boot-demo:latest")
+                        // Push the tagged image
+                        docker.image("naadira/spring-boot-demo:latest").push()
+                    }
                 }
             }
-          }
         }
-
         
         stage('Deploy to EC2') {
             steps {
