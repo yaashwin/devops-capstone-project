@@ -57,7 +57,7 @@ pipeline {
                 docker pull naadira/spring-boot-demo:latest
 
                 # Run the new container
-                docker run -d --name spring-boot-demo-container -p 8080:8080 naadira/spring-boot-demo:latest
+                docker run -d --name spring-boot-demo-container -p 8081:8080 naadira/spring-boot-demo:latest
                 ENDSSH
             '''
         }
