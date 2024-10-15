@@ -44,24 +44,25 @@ pipeline {
         }
 
         stage('Deploy to EC2') {
-            steps {
-                sshagent(['ec2-ssh-key_1']) {
-                    sh '''
-                    #!/bin/bash
-                    set -e  # Exit immediately if a command exits with a non-zero status
-                    ssh -o StrictHostKeyChecking=no ec2-user@ec2-3-128-182-162.us-east-2.compute.amazonaws.com "
-                        # Stop and remove existing container if it exists
-                        docker ps -q --filter name=spring-boot-demo | xargs -r docker stop || true
-                        docker ps -aq --filter name=spring-boot-demo | xargs -r docker rm || true
-                        
-                        # Pull the latest image and run a new container
-                        docker pull naadira/spring-boot-demo:${env.BUILD_ID}
-                        docker run -d -p 8080:8080 --name spring-boot-demo naadira/spring-boot-demo:${env.BUILD_ID}
-                    "
-                    '''
-                }
-            }
+    steps {
+        sshagent(['ec2-ssh-key_1']) {
+            sh '''
+            #!/bin/bash
+            set -e  # Exit immediately if a command exits with a non-zero status
+            ssh -o StrictHostKeyChecking=no ec2-user@ec2-3-128-182-162.us-east-2.compute.amazonaws.com << 'EOF'
+                # Stop and remove existing container if it exists
+                docker ps -q --filter name=spring-boot-demo | xargs -r docker stop
+                docker ps -aq --filter name=spring-boot-demo | xargs -r docker rm
+                
+                # Pull the latest image and run a new container
+                docker pull naadira/spring-boot-demo:latest
+                docker run -d -p 8080:8080 --name spring-boot-demo naadira/spring-boot-demo:latest
+            EOF
+            '''
         }
+    }
+}
+
     }
 
     post {
