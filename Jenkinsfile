@@ -8,15 +8,17 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
+                // Clone the Git repository
                 git 'https://github.com/Naadira/devops-capstone-project.git'
             }
         }
         
         stage('Build with Maven') {
             steps {
-                // Grant execute permission to mvnw
+                // Grant execute permission to mvnw (if you're using it, otherwise you can omit this line)
                 sh 'chmod +x mvnw'
-                sh './mvnw clean package' // Build the project
+                // Build the project
+                sh './mvnw clean package' 
             }
         }
         
@@ -32,26 +34,27 @@ pipeline {
         stage('Push Docker Image to Docker Hub') {
             steps {
                 script {
+                    // Log in to Docker Hub and push the tagged image
                     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
-                        // Push the tagged image to Docker Hub
+                        // Push the tagged image to Docker Hub with latest tag
                         docker.image("naadira/spring-boot-demo:${env.BUILD_ID}").push("latest")
                     }
                 }
             }
         }
-        
+
         stage('Deploy to EC2') {
             steps {
                 sshagent(['ec2-ssh-key_1']) {
                     sh '''
                     ssh -o StrictHostKeyChecking=no ec2-user@ec2-3-128-182-162.us-east-2.compute.amazonaws.com "
                         # Stop and remove existing container if it exists
-                        docker ps -q --filter "name=spring-boot-demo" | xargs -r docker stop
-                        docker ps -aq --filter "name=spring-boot-demo" | xargs -r docker rm
+                        docker ps -q --filter name=spring-boot-demo | xargs -r docker stop
+                        docker ps -aq --filter name=spring-boot-demo | xargs -r docker rm
                         
                         # Pull the latest image and run a new container
-                        docker pull naadira/spring-boot-demo:${BUILD_ID}
-                        docker run -d -p 8080:8080 --name spring-boot-demo naadira/spring-boot-demo:${BUILD_ID}
+                        docker pull naadira/spring-boot-demo:latest
+                        docker run -d -p 8080:8080 --name spring-boot-demo naadira/spring-boot-demo:latest
                     "
                     '''
                 }
