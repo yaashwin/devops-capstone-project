@@ -8,7 +8,8 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/yourusername/your-repo.git'
+                git credentialsId: 'jenkins_test', url: 'https://github.com/Naadira/devops-capstone-project.git'
+            }
             }
         }
         
