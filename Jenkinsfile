@@ -44,7 +44,15 @@ pipeline {
             steps {
                 sshagent(['ec2-ssh-key_1']) {
                     sh '''
-                    ssh -o StrictHostKeyChecking=no ec2-user@ec2-3-128-182-162.us-east-2.compute.amazonaws.com "docker pull naadira/spring-boot-demo:latest && docker run -d -p 8080:8080 naadira/spring-boot-demo:latest"                   
+                    ssh -o StrictHostKeyChecking=no ec2-user@ec2-3-128-182-162.us-east-2.compute.amazonaws.com "
+                        # Stop and remove existing container if it exists
+                        docker ps -q --filter "name=spring-boot-demo" | xargs -r docker stop
+                        docker ps -aq --filter "name=spring-boot-demo" | xargs -r docker rm
+                        
+                        # Pull the latest image and run a new container
+                        docker pull naadira/spring-boot-demo:${BUILD_ID}
+                        docker run -d -p 8080:8080 --name spring-boot-demo naadira/spring-boot-demo:${BUILD_ID}
+                    "
                     '''
                 }
             }
