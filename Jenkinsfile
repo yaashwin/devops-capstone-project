@@ -42,7 +42,7 @@ pipeline {
             steps {
                 sshagent(['ec2-ssh-key']) {
                     sh '''
-                    ssh ec2-user@<your-ec2-instance-ip> "docker pull your-dockerhub-username/spring-boot-demo:latest && docker run -d -p 8080:8080 your-dockerhub-username/spring-boot-demo:latest"
+                    ssh -i "devops-project.pem" ec2-user@ec2-3-128-182-162.us-east-2.compute.amazonaws.com "docker pull naadira/spring-boot-demo:latest && docker run -d -p 8080:8080 naadira/spring-boot-demo:latest"
                     '''
                 }
             }
