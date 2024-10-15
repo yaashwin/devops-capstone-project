@@ -36,8 +36,8 @@ pipeline {
                 script {
                     // Log in to Docker Hub and push the tagged image
                     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
-                        // Push the tagged image to Docker Hub with latest tag
-                        docker.image("naadira/spring-boot-demo:${env.BUILD_ID}").push("latest")
+                        // Push the tagged image to Docker Hub with the build ID tag
+                        docker.image("naadira/spring-boot-demo:${env.BUILD_ID}").push("${env.BUILD_ID}")
                     }
                 }
             }
@@ -48,13 +48,19 @@ pipeline {
                 sshagent(['ec2-ssh-key_1']) {
                     sh '''
                     ssh -o StrictHostKeyChecking=no ec2-user@ec2-3-128-182-162.us-east-2.compute.amazonaws.com "
-                        # Stop and remove existing container if it exists
-                        docker ps -q --filter name=spring-boot-demo | xargs -r docker stop
-                        docker ps -aq --filter name=spring-boot-demo | xargs -r docker rm
+                        # Check if the container is running and stop it if it exists
+                        if [ \$(docker ps -q --filter name=spring-boot-demo) ]; then
+                            docker stop spring-boot-demo
+                        fi
+
+                        # Check if the container exists and remove it if it does
+                        if [ \$(docker ps -aq --filter name=spring-boot-demo) ]; then
+                            docker rm spring-boot-demo
+                        fi
                         
-                        # Pull the latest image and run a new container
-                        docker pull naadira/spring-boot-demo:latest
-                        docker run -d -p 8080:8080 --name spring-boot-demo naadira/spring-boot-demo:latest
+                        # Pull the latest image with the specific build ID and run a new container
+                        docker pull naadira/spring-boot-demo:${env.BUILD_ID}
+                        docker run -d -p 8080:8080 --name spring-boot-demo naadira/spring-boot-demo:${env.BUILD_ID}
                     "
                     '''
                 }
