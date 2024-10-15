@@ -44,7 +44,7 @@ pipeline {
             steps {
                 sshagent(['ec2-ssh-key_1']) {
                     sh '''
-                    ssh -i "devops-project.pem" ec2-user@ec2-3-128-182-162.us-east-2.compute.amazonaws.com "docker pull naadira/spring-boot-demo:latest && docker run -d -p 8080:8080 naadira/spring-boot-demo:latest"
+                    ssh -o StrictHostKeyChecking=no ec2-user@ec2-3-128-182-162.us-east-2.compute.amazonaws.com "docker pull naadira/spring-boot-demo:latest && docker run -d -p 8080:8080 naadira/spring-boot-demo:latest"                   
                     '''
                 }
             }
