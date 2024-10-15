@@ -32,9 +32,9 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
-                        // Correct the image tag here
+                        // Tag the image with the latest tag
                         docker.image("spring-boot-demo:${env.BUILD_ID}").tag("naadira/spring-boot-demo:latest")
-                        // Push the tagged image
+                        // Push the tagged image to Docker Hub
                         docker.image("naadira/spring-boot-demo:latest").push()
                     }
                 }
