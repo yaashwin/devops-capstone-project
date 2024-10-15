@@ -16,13 +16,14 @@ pipeline {
             steps {
                 // Grant execute permission to mvnw
                 sh 'chmod +x mvnw'
-                sh './mvnw clean package'
+                sh './mvnw clean package' // Build the project
             }
         }
         
         stage('Build Docker Image') {
             steps {
                 script {
+                    // Build the Docker image and tag it with the build ID
                     docker.build("spring-boot-demo:${env.BUILD_ID}")
                 }
             }
