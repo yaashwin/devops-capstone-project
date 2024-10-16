@@ -8,7 +8,7 @@ WORKDIR /app
 COPY target/demo-0.0.1-SNAPSHOT.jar /app/demo.jar
 
 # Expose the application's port (update to 9090)
-EXPOSE 9090
+EXPOSE 8081
 
 # Run the application
 ENTRYPOINT ["java", "-jar", "/app/demo.jar"]
