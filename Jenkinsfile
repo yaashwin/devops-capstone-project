@@ -23,10 +23,10 @@ pipeline {
         }
         
         stage('Build Docker Image') {
-            steps {
+             steps {
                 script {
-                    // Build the Docker image and tag it as 'latest'
-                    docker.build("naadira/spring-boot-demo:latest")
+                    // Build the Docker image and tag it with the Jenkins build ID
+                    docker.build("spring-boot-demo:${env.BUILD_ID}")
                 }
             }
         }
