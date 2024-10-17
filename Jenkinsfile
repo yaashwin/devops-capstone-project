@@ -9,7 +9,7 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 // Clone the Git repository
-                git 'https://github.com/Naadira/devops-capstone-project.git'
+                git 'https://github.com/yaashwin/devops-capstone-project.git'
             }
         }
         
