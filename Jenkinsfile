@@ -26,7 +26,7 @@ pipeline {
              steps {
                 script {
                     // Build the Docker image and tag it with the Jenkins build ID
-                    docker.build("spring-boot-demo:${env.BUILD_ID}")
+                    docker.build("yaashwin06/spring-boot-demo:latest")
                 }
             }
         }
@@ -37,7 +37,7 @@ pipeline {
                     // Log in to Docker Hub and push the tagged image
                     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
                         // Push the image with the 'latest' tag
-                        docker.image("naadira/spring-boot-demo:latest").push("latest")
+                        docker.image("yaashwin06/spring-boot-demo:latest").push("latest")
                     }
                 }
             }
@@ -47,11 +47,11 @@ pipeline {
             steps {
                 sshagent(['ec2-ssh-key_1']) {
                     sh '''
-                    ssh -o StrictHostKeyChecking=no ec2-user@ec2-3-128-182-162.us-east-2.compute.amazonaws.com "
-                        docker pull naadira/spring-boot-demo:latest && 
+                    ssh -o StrictHostKeyChecking=no ec2-user@ec2-34-239-142-14.compute-1.amazonaws.com "
+                        docker pull yaashwin06/spring-boot-demo:latest && 
                         docker stop spring-boot-demo || true && 
                         docker rm spring-boot-demo || true && 
-                        docker run -d --name spring-boot-demo -p 8080:8080 naadira/spring-boot-demo:latest"
+                        docker run -d --name spring-boot-demo -p 8080:8080 yaashwin06/spring-boot-demo:latest"
                     '''
                 }
             }
